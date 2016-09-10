@@ -25,7 +25,7 @@ var interval = 3000; //milliseconds
 /**
  * array of the models you want. Use the models list below if you arent sure of the model numbers
  */
-var modelsWanted = ["MN4V2B/A", "MN982B/A"]; 
+var modelsWanted = ["MN4V2B/A", "MN982B/A"];
 
 /**
  * prowl API. Used for push notifications. Sign up at https://www.prowlapp.com and download the app to your phone
@@ -155,19 +155,38 @@ function addStoreToNotification(storesWithStock, store, modelCode, storeCode) {
 }
 
 /**
+ * Chunks an array.
+ * Returns an array of arrays, all of max n size
+ */
+function chunk (array, size) {
+  return array.reduce(function (res, item, index) {
+    if (index % size === 0) { res.push([]); }
+    res[res.length-1].push(item);
+    return res;
+  }, []);
+}
+
+/**
  * Send the notification about models found stock (if any - if no models are found no notification will be displayed, and 
  * "No Stock" is diplayed in the console)
+ * Sends at most 50 stores at a time, so chunks into multiple messages if there are more stores with stock.
  * @param {array} storesWithStock an array of messages about stock found in stores, e.g. ["model x was found in y", "model z was found in y"]. This will be used as the notificaiton text
  */
 function sendStockMessage(storesWithStock) {
   if (storesWithStock.length > 0) {
-    var message = "";
-    storesWithStock.forEach(function(storeMessage) {
-      message += storeMessage + "\n";
-    });
+    var chunks = chunk(storesWithStock, 50);
 
-    console.log(message);
-    sendProwlMessage(message, 2);
+    chunks.forEach(function(storesChunk){
+      var message = "";
+      storesChunk.forEach(function(storeMessage) {
+        message += storeMessage + "\n";
+      });
+
+      console.log(message);
+      sendProwlMessage(message, 2);
+
+    })
+    
   } else {
     console.log("No New Stock");
   }
