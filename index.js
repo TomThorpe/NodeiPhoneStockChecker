@@ -33,12 +33,6 @@ var modelsWanted = ["MN4V2B/A", "MN982B/A"];
 var prowlApiKey = ""; //add your API key
 
 /**
- * URL to open when swiping the push notification (suggested as a link to the reservation page)
- * CHANGE THIS IF YOU ARE NOT IN THE UK
- */
-var pushNotificationOpenUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/availability"; //the URL to associate with your push notifications ()
-
-/**
  * The url to the list of stores. These are different for different countries
  * CHANGE THIS IF YOU ARE NOT IN THE UK
  * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensibl
@@ -55,34 +49,34 @@ var stockJsonUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/availa
 
 
 var models = {
-  "MN8X2B/A": "iPhone 7 32GB Black",
-  "MN8Y2B/A": "iPhone 7 32GB Silver",
-  "MN902B/A": "iPhone 7 32GB Gold",
-  "MN912B/A": "iPhone 7 32GB Rose Gold",
-  "MN922B/A": "iPhone 7 128GB Black",
-  "MN932B/A": "iPhone 7 128GB Silver",
-  "MN942B/A": "iPhone 7 128GB Gold",
-  "MN952B/A": "iPhone 7 128GB Rose Gold",
-  "MN962B/A": "iPhone 7 128GB Jet Black",
-  "MN972B/A": "iPhone 7 256GB Black",
-  "MN982B/A": "iPhone 7 256GB Silver",
-  "MN992B/A": "iPhone 7 256GB Gold",
-  "MN9A2B/A": "iPhone 7 256GB Rose Gold",
-  "MN9C2B/A": "iPhone 7 256GB Jet Black",
-  "MN4M2B/A": "iPhone 7 Plus 128GB Black",
-  "MN4P2B/A": "iPhone 7 Plus 128GB Silver",
-  "MN4Q2B/A": "iPhone 7 Plus 128GB Gold",
-  "MN4U2B/A": "iPhone 7 Plus 128GB Rose Gold",
-  "MN4V2B/A": "iPhone 7 Plus 128GB Jet Black",
-  "MN4W2B/A": "iPhone 7 Plus 256GB Black",
-  "MN4X2B/A": "iPhone 7 Plus 256GB Silver",
-  "MN4Y2B/A": "iPhone 7 Plus 256GB Gold",
-  "MN502B/A": "iPhone 7 Plus 256GB Rose Gold",
-  "MN512B/A": "iPhone 7 Plus 256GB Jet Black",
-  "MNQM2B/A": "iPhone 7 Plus 32GB Black",
-  "MNQN2B/A": "iPhone 7 Plus 32GB Silver",
-  "MNQP2B/A": "iPhone 7 Plus 32GB Gold",
-  "MNQQ2B/A": "iPhone 7 Plus 32GB Rose Gold"
+  "MN8X2B/A": "UK iPhone 7 32GB Black",
+  "MN8Y2B/A": "UK iPhone 7 32GB Silver",
+  "MN902B/A": "UK iPhone 7 32GB Gold",
+  "MN912B/A": "UK iPhone 7 32GB Rose Gold",
+  "MN922B/A": "UK iPhone 7 128GB Black",
+  "MN932B/A": "UK iPhone 7 128GB Silver",
+  "MN942B/A": "UK iPhone 7 128GB Gold",
+  "MN952B/A": "UK iPhone 7 128GB Rose Gold",
+  "MN962B/A": "UK iPhone 7 128GB Jet Black",
+  "MN972B/A": "UK iPhone 7 256GB Black",
+  "MN982B/A": "UK iPhone 7 256GB Silver",
+  "MN992B/A": "UK iPhone 7 256GB Gold",
+  "MN9A2B/A": "UK iPhone 7 256GB Rose Gold",
+  "MN9C2B/A": "UK iPhone 7 256GB Jet Black",
+  "MN4M2B/A": "UK iPhone 7 Plus 128GB Black",
+  "MN4P2B/A": "UK iPhone 7 Plus 128GB Silver",
+  "MN4Q2B/A": "UK iPhone 7 Plus 128GB Gold",
+  "MN4U2B/A": "UK iPhone 7 Plus 128GB Rose Gold",
+  "MN4V2B/A": "UK iPhone 7 Plus 128GB Jet Black",
+  "MN4W2B/A": "UK iPhone 7 Plus 256GB Black",
+  "MN4X2B/A": "UK iPhone 7 Plus 256GB Silver",
+  "MN4Y2B/A": "UK iPhone 7 Plus 256GB Gold",
+  "MN502B/A": "UK iPhone 7 Plus 256GB Rose Gold",
+  "MN512B/A": "UK iPhone 7 Plus 256GB Jet Black",
+  "MNQM2B/A": "UK iPhone 7 Plus 32GB Black",
+  "MNQN2B/A": "UK iPhone 7 Plus 32GB Silver",
+  "MNQP2B/A": "UK iPhone 7 Plus 32GB Gold",
+  "MNQQ2B/A": "UK iPhone 7 Plus 32GB Rose Gold"
 }
 
 /**
@@ -240,7 +234,6 @@ function sendProwlMessage(message, priority) {
       form: {
         apikey: prowlApiKey,
         priority: priority,
-        url: pushNotificationOpenUrl,
         application: "Stock Checker",
         "event": "iPhone 7 Stock",
         description: message,

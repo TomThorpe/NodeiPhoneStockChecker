@@ -12,9 +12,8 @@ _Note: This project uses Prowl to send notifications to you when stock is found,
 * Run "npm install"
 * Open index.js and edit the properties at the top of the file under BEGIN CONFIG OPTIONS.
   * `interval` - The interval between polling in milliseconds. I suggest 3 seconds (3000 milliseconds). Dont make it to small.
-  * `modelsWanted` - An array of strings of the models you want. The script will search for these models in any stores. There is a full list of models at the end of this readme, or also in index.js just underneath the config options
+  * `modelsWanted` - An array of strings of the models you want. The script will search for these models in any stores. There is a full list of models at the end of this readme, or also in index.js just underneath the config options. Remember to pick one for your country. If it is not there, try and research the model number and maybe open a PR to add it here :-)
   * `prowlApiKey` The API key for your prowl account. Get it from the API tab at https://www.prowlapp.com
-  * `pushNotificationOpenUrl` the URL to open when swiping the push notification. I suggest this be the URL for reserving phones in your country (if you are not from the UK you will need to change this). This is not required.
   * `storesJsonUrl` Stores list JSON If you are not in the UK, you need to set this to the JSON url for location of your choice by figuring out the URL (e.g. https://reserve.cdn-apple.com/US/en_US/reserve/iPhone/stores.json for the USA)
   * `stockJsonUrl`  Stock list JSON If you are not in the UK, you need to set this to the JSON url for location of your choice by figuring out the json (e.g. https://reserve.cdn-apple.com/US/en_US/reserve/iPhone/availability.json for the USA)
 * Save your changes to the index.js file
