@@ -21,4 +21,4 @@ _Note: This project uses Prowl to send notifications to you when stock is found,
 * *Remember, if you close your window, the task will stop running!* If you are using digitalocean or another remote server, you might want to first run `tmux` (https://danielmiessler.com/study/tmux/) before running `npm start` so that you can leave the task running.
 
 # Tips
-* When stock is found this tool sends it with a priority of "Emergency" in Prowl. If you change the notification sounds in Prowl, you can set a longer and louder notification alert for Emergency messages
+* When stock is found this tool sends it with a priority of "Emergency" in Prowl. If you change the notification sounds in Prowl you can set a longer and louder notification alert for Emergency messages
