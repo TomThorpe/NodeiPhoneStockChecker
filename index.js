@@ -272,5 +272,3 @@ if (validateWantedModels()) {
       reportError("Error downloading stores " + err);
     });
 }
-
-
