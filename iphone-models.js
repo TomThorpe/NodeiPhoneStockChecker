@@ -10,6 +10,8 @@
  * Author: Tom Thorpe
  */
 
+ module.exports = {
+
   models : {
     "MN8X2B/A": "UK iPhone 7 32GB Black",
     "MN8Y2B/A": "UK iPhone 7 32GB Silver",
@@ -139,6 +141,6 @@
     "MNQT2LL/A" : "US iPhone 7 Plus 32GB Silver (GSM)",
     "MNQU2LL/A" : "US iPhone 7 Plus 32GB Gold (GSM)",
     "MNQV2LL/A" : "US iPhone 7 Plus 32GB Rose Gold (GSM)"
-  }
+}
 
 }
