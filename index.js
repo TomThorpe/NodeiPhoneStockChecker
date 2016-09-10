@@ -13,6 +13,7 @@
 var rp = require('request-promise');
 var Promise = require("bluebird");
 var NodeCache = require("node-cache");
+var models = require("./iphone-models.js");
 
 
 //BEGIN CONFIG OPTIONS--------
@@ -47,137 +48,6 @@ var storesJsonUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/store
 var stockJsonUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/availability.json";
 //END CONFIG OPTIONS----------
 
-
-var models = {
-  "MN8X2B/A": "UK iPhone 7 32GB Black",
-  "MN8Y2B/A": "UK iPhone 7 32GB Silver",
-  "MN902B/A": "UK iPhone 7 32GB Gold",
-  "MN912B/A": "UK iPhone 7 32GB Rose Gold",
-  "MN922B/A": "UK iPhone 7 128GB Black",
-  "MN932B/A": "UK iPhone 7 128GB Silver",
-  "MN942B/A": "UK iPhone 7 128GB Gold",
-  "MN952B/A": "UK iPhone 7 128GB Rose Gold",
-  "MN962B/A": "UK iPhone 7 128GB Jet Black",
-  "MN972B/A": "UK iPhone 7 256GB Black",
-  "MN982B/A": "UK iPhone 7 256GB Silver",
-  "MN992B/A": "UK iPhone 7 256GB Gold",
-  "MN9A2B/A": "UK iPhone 7 256GB Rose Gold",
-  "MN9C2B/A": "UK iPhone 7 256GB Jet Black",
-  "MN4M2B/A": "UK iPhone 7 Plus 128GB Black",
-  "MN4P2B/A": "UK iPhone 7 Plus 128GB Silver",
-  "MN4Q2B/A": "UK iPhone 7 Plus 128GB Gold",
-  "MN4U2B/A": "UK iPhone 7 Plus 128GB Rose Gold",
-  "MN4V2B/A": "UK iPhone 7 Plus 128GB Jet Black",
-  "MN4W2B/A": "UK iPhone 7 Plus 256GB Black",
-  "MN4X2B/A": "UK iPhone 7 Plus 256GB Silver",
-  "MN4Y2B/A": "UK iPhone 7 Plus 256GB Gold",
-  "MN502B/A": "UK iPhone 7 Plus 256GB Rose Gold",
-  "MN512B/A": "UK iPhone 7 Plus 256GB Jet Black",
-  "MNQM2B/A": "UK iPhone 7 Plus 32GB Black",
-  "MNQN2B/A": "UK iPhone 7 Plus 32GB Silver",
-  "MNQP2B/A": "UK iPhone 7 Plus 32GB Gold",
-  "MNQQ2B/A": "UK iPhone 7 Plus 32GB Rose Gold",
-  "MN9D2LL/A" : "US iPhone 7 32GB Black (GSM)",
-"MN9E2LL/A" : "US iPhone 7 32GB Silver (GSM)",
-"MN9F2LL/A" : "US iPhone 7 32GB Gold (GSM)",
-"MN9G2LL/A" : "US iPhone 7 32GB Rose Gold (GSM)",
-"MN9H2LL/A" : "US iPhone 7 128GB Black (GSM)",
-"MN9J2LL/A" : "US iPhone 7 128GB Silver (GSM)",
-"MN9K2LL/A" : "US iPhone 7 128GB Gold (GSM)",
-"MN9L2LL/A" : "US iPhone 7 128GB Rose Gold (GSM)",
-"MN9M2LL/A" : "US iPhone 7 128GB Jet Black (GSM)",
-"MN9N2LL/A" : "US iPhone 7 256GB Black (GSM)",
-"MN9P2LL/A" : "US iPhone 7 256GB Silver (GSM)",
-"MN9Q2LL/A" : "US iPhone 7 256GB Gold (GSM)",
-"MN9R2LL/A" : "US iPhone 7 256GB Rose Gold (GSM)",
-"MN9T2LL/A" : "US iPhone 7 256GB Jet Black (GSM)",
-"MN9U2LL/A" : "US iPhone 7 32GB Black (GSM)",
-"MN9V2LL/A" : "US iPhone 7 32GB Silver (GSM)",
-"MN9W2LL/A" : "US iPhone 7 32GB Gold (GSM)",
-"MN9X2LL/A" : "US iPhone 7 32GB Rose Gold (GSM)",
-"MN9Y2LL/A" : "US iPhone 7 128GB Black (GSM)",
-"MNA02LL/A" : "US iPhone 7 128GB Silver (GSM)",
-"MNA32LL/A" : "US iPhone 7 128GB Gold (GSM)",
-"MNA42LL/A" : "US iPhone 7 128GB Rose Gold (GSM)",
-"MNA52LL/A" : "US iPhone 7 128GB Jet Black (GSM)",
-"MNA62LL/A" : "US iPhone 7 256GB Black (GSM)",
-"MNA72LL/A" : "US iPhone 7 256GB Silver (GSM)",
-"MNA82LL/A" : "US iPhone 7 256GB Gold (GSM)",
-"MNA92LL/A" : "US iPhone 7 256GB Rose Gold (GSM)",
-"MNAA2LL/A" : "US iPhone 7 256GB Jet Black (GSM)",
-"MNAC2LL/A" : "US iPhone 7 32GB Black",
-"MNAD2LL/A" : "US iPhone 7 32GB Silver",
-"MNAE2LL/A" : "US iPhone 7 32GB Gold",
-"MNAF2LL/A" : "US iPhone 7 32GB Rose Gold",
-"MNAJ2LL/A" : "US iPhone 7 128GB Black",
-"MNAK2LL/A" : "US iPhone 7 128GB Silver",
-"MNAL2LL/A" : "US iPhone 7 128GB Gold",
-"MNAM2LL/A" : "US iPhone 7 128GB Rose Gold",
-"MNAP2LL/A" : "US iPhone 7 128GB Jet Black",
-"MNAQ2LL/A" : "US iPhone 7 256GB Black",
-"MNAU2LL/A" : "US iPhone 7 256GB Silver",
-"MNAV2LL/A" : "US iPhone 7 256GB Gold",
-"MNAW2LL/A" : "US iPhone 7 256GB Rose Gold",
-"MNAX2LL/A" : "US iPhone 7 256GB Jet Black",
-"MNAY2LL/A" : "US iPhone 7 32GB Black",
-"MNC02LL/A" : "US iPhone 7 32GB Silver",
-"MNC12LL/A" : "US iPhone 7 32GB Gold",
-"MNC22LL/A" : "US iPhone 7 32GB Rose Gold",
-"MNC32LL/A" : "US iPhone 7 128GB Black",
-"MNC42LL/A" : "US iPhone 7 128GB Silver",
-"MNC52LL/A" : "US iPhone 7 128GB Gold",
-"MNC62LL/A" : "US iPhone 7 128GB Rose Gold",
-"MNC72LL/A" : "US iPhone 7 128GB Jet Black",
-"MNC82LL/A" : "US iPhone 7 256GB Black",
-"MNC92LL/A" : "US iPhone 7 256GB Silver",
-"MNCA2LL/A" : "US iPhone 7 256GB Gold",
-"MNCC2LL/A" : "US iPhone 7 256GB Rose Gold",
-"MNCD2LL/A" : "US iPhone 7 256GB Jet Black",
-"MN522LL/A" : "US iPhone 7 Plus 128GB Black (GSM)",
-"MN532LL/A" : "US iPhone 7 Plus 128GB Silver (GSM)",
-"MN552LL/A" : "US iPhone 7 Plus 128GB Gold (GSM)",
-"MN562LL/A" : "US iPhone 7 Plus 128GB Rose Gold (GSM)",
-"MN572LL/A" : "US iPhone 7 Plus 128GB Jet Black (GSM)",
-"MN592LL/A" : "US iPhone 7 Plus 256GB Black (GSM)",
-"MN5C2LL/A" : "US iPhone 7 Plus 256GB Silver (GSM)",
-"MN5D2LL/A" : "US iPhone 7 Plus 256GB Gold (GSM)",
-"MN5E2LL/A" : "US iPhone 7 Plus 256GB Rose Gold (GSM)",
-"MN5F2LL/A" : "US iPhone 7 Plus 256GB Jet Black (GSM)",
-"MN5G2LL/A" : "US iPhone 7 Plus 128GB Black (GSM)",
-"MN5H2LL/A" : "US iPhone 7 Plus 128GB Silver (GSM)",
-"MN5J2LL/A" : "US iPhone 7 Plus 128GB Gold (GSM)",
-"MN5K2LL/A" : "US iPhone 7 Plus 128GB Rose Gold (GSM)",
-"MN5L2LL/A" : "US iPhone 7 Plus 128GB Jet Black (GSM)",
-"MN5M2LL/A" : "US iPhone 7 Plus 256GB Black (GSM)",
-"MN5N2LL/A" : "US iPhone 7 Plus 256GB Silver (GSM)",
-"MN5P2LL/A" : "US iPhone 7 Plus 256GB Gold (GSM)",
-"MN5Q2LL/A" : "US iPhone 7 Plus 256GB Rose Gold (GSM)",
-"MN5R2LL/A" : "US iPhone 7 Plus 256GB Jet Black (GSM)",
-"MN5T2LL/A" : "US iPhone 7 Plus 128GB Black",
-"MN5U2LL/A" : "US iPhone 7 Plus 128GB Silver",
-"MN5V2LL/A" : "US iPhone 7 Plus 128GB Gold",
-"MN5W2LL/A" : "US iPhone 7 Plus 128GB Rose Gold",
-"MN5X2LL/A" : "US iPhone 7 Plus 128GB Jet Black",
-"MN5Y2LL/A" : "US iPhone 7 Plus 256GB Black",
-"MN602LL/A" : "US iPhone 7 Plus 256GB Silver",
-"MN612LL/A" : "US iPhone 7 Plus 256GB Gold",
-"MN622LL/A" : "US iPhone 7 Plus 256GB Rose Gold",
-"MN632LL/A" : "US iPhone 7 Plus 256GB Jet Black",
-"MN642LL/A" : "US iPhone 7 Plus 128GB Black",
-"MN652LL/A" : "US iPhone 7 Plus 128GB Silver",
-"MN662LL/A" : "US iPhone 7 Plus 128GB Gold",
-"MN672LL/A" : "US iPhone 7 Plus 128GB Rose Gold",
-"MN682LL/A" : "US iPhone 7 Plus 128GB Jet Black",
-"MN692LL/A" : "US iPhone 7 Plus 256GB Black",
-"MN6A2LL/A" : "US iPhone 7 Plus 256GB Silver",
-"MN6C2LL/A" : "US iPhone 7 Plus 256GB Gold",
-"MN6D2LL/A" : "US iPhone 7 Plus 256GB Rose Gold",
-"MN6E2LL/A" : "US iPhone 7 Plus 256GB Jet Black",
-"MNQR2LL/A" : "US iPhone 7 Plus 32GB Black (GSM)",
-"MNQT2LL/A" : "US iPhone 7 Plus 32GB Silver (GSM)",
-"MNQU2LL/A" : "US iPhone 7 Plus 32GB Gold (GSM)",
-"MNQV2LL/A" : "US iPhone 7 Plus 32GB Rose Gold (GSM)"
-}
 
 /**
  * Cache to stop messages being sent about stock on every request. If a message was already sent in last x seconds, it wont be sent again
@@ -280,7 +150,7 @@ function addStoreToNotification(storesWithStock, store, modelCode, storeCode) {
   var cached = notificationsSentCache.get(key);
   if (cached == undefined) {
     notificationsSentCache.set(key, "sent");
-    storesWithStock.push(store + " has stock of " + models[modelCode]);
+    storesWithStock.push(store + " has stock of " + models.models[modelCode]);
   }
 }
 
@@ -308,14 +178,14 @@ function sendStockMessage(storesWithStock) {
  * @param {object} unfoundModels an associative array of model codes as keys where the model was not found (e.g. {"B35643" : anything, "FKGJF" : anything} )
  */
 function sendUnfoundModelsMessage(unfoundModels) {
-  var models = "";
+  var unfound = "";
   for (var key in unfoundModels) {
     if (unfoundModels.hasOwnProperty(key)) {
-      models += key + " ";
+      unfound += key + " ";
     }
   }
-  if (models.length > 0) {
-    reportError("Some of the models you requested were not found in the store stock list, there may be a problem with the store feed: " + models);
+  if (unfound.length > 0) {
+    reportError("Some of the models you requested were not found in the store stock list, there may be a problem with the store feed: " + unfound);
   }
 
 }
@@ -373,7 +243,7 @@ function validateWantedModels() {
   }
 
   //no models config
-  if (models.length == 0) {
+  if (models.models.length == 0) {
     reportError("There are no models in the models config, this is a configuration error. Polling has NOT started! ");
     return false;
   }
@@ -381,7 +251,7 @@ function validateWantedModels() {
   //check validity of modelsWanted
   var invalidModels = [];
   modelsWanted.forEach(function(model) {
-    if (models[model] == undefined) {
+    if (models.models[model] == undefined) {
       invalidModels.push(model);
     }
   });
