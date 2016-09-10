@@ -1,0 +1,327 @@
+/*
+ * Copyright 2016 Tom Thorpe
+ *
+ * Distributed under the ISC Licence 
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * Author: Tom Thorpe
+ */
+
+var rp = require('request-promise');
+var Promise = require("bluebird");
+var NodeCache = require("node-cache");
+
+
+//BEGIN CONFIG OPTIONS--------
+/**
+ * The interval to wait in betwen polls (in milliseconds)
+ */
+var interval = 3000; //milliseconds
+
+/**
+ * array of the models you want. Use the models list below if you arent sure of the model numbers
+ */
+var modelsWanted = ["MN4V2B/A", "MN982B/A"]; 
+
+/**
+ * prowl API. Used for push notifications. Sign up at https://www.prowlapp.com and download the app to your phone
+ * If you dont set this up you won't get push notifications, you will only get console output
+ */
+var prowlApiKey = ""; //add your API key
+
+/**
+ * URL to open when swiping the push notification (suggested as a link to the reservation page)
+ * CHANGE THIS IF YOU ARE NOT IN THE UK
+ */
+var pushNotificationOpenUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/availability"; //the URL to associate with your push notifications ()
+
+/**
+ * The url to the list of stores. These are different for different countries
+ * CHANGE THIS IF YOU ARE NOT IN THE UK
+ * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensibl
+ */
+var storesJsonUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/stores.json";
+
+/**
+ * The url to the list of stock. These are different for different countries
+ * CHANGE THIS IF YOU ARE NOT IN THE UK
+ * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensibl
+ */
+var stockJsonUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/availability.json";
+//END CONFIG OPTIONS----------
+
+
+var models = {
+  "MN8X2B/A": "iPhone 7 32GB Black",
+  "MN8Y2B/A": "iPhone 7 32GB Silver",
+  "MN902B/A": "iPhone 7 32GB Gold",
+  "MN912B/A": "iPhone 7 32GB Rose Gold",
+  "MN922B/A": "iPhone 7 128GB Black",
+  "MN932B/A": "iPhone 7 128GB Silver",
+  "MN942B/A": "iPhone 7 128GB Gold",
+  "MN952B/A": "iPhone 7 128GB Rose Gold",
+  "MN962B/A": "iPhone 7 128GB Jet Black",
+  "MN972B/A": "iPhone 7 256GB Black",
+  "MN982B/A": "iPhone 7 256GB Silver",
+  "MN992B/A": "iPhone 7 256GB Gold",
+  "MN9A2B/A": "iPhone 7 256GB Rose Gold",
+  "MN9C2B/A": "iPhone 7 256GB Jet Black",
+  "MN4M2B/A": "iPhone 7 Plus 128GB Black",
+  "MN4P2B/A": "iPhone 7 Plus 128GB Silver",
+  "MN4Q2B/A": "iPhone 7 Plus 128GB Gold",
+  "MN4U2B/A": "iPhone 7 Plus 128GB Rose Gold",
+  "MN4V2B/A": "iPhone 7 Plus 128GB Jet Black",
+  "MN4W2B/A": "iPhone 7 Plus 256GB Black",
+  "MN4X2B/A": "iPhone 7 Plus 256GB Silver",
+  "MN4Y2B/A": "iPhone 7 Plus 256GB Gold",
+  "MN502B/A": "iPhone 7 Plus 256GB Rose Gold",
+  "MN512B/A": "iPhone 7 Plus 256GB Jet Black",
+  "MNQM2B/A": "iPhone 7 Plus 32GB Black",
+  "MNQN2B/A": "iPhone 7 Plus 32GB Silver",
+  "MNQP2B/A": "iPhone 7 Plus 32GB Gold",
+  "MNQQ2B/A": "iPhone 7 Plus 32GB Rose Gold"
+}
+
+/**
+ * Cache to stop messages being sent about stock on every request. If a message was already sent in last x seconds, it wont be sent again
+ */
+var notificationsSentCache = new NodeCache({
+  stdTTL: 300,
+  checkperiod: 120
+});
+
+var storesRequest = {
+  uri: storesJsonUrl,
+  json: true
+};
+
+var stockRequest = {
+  uri: stockJsonUrl,
+  json: true
+};
+
+/**
+ * Begin the process to check the stock, then recursively calls itself asyncronously to check the stock again after interval time
+ * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
+ */
+function getStock(stores) {
+  getStockRequest(stores)
+    .delay(interval)
+    .then(function() {
+      process.nextTick(function() {
+        getStock(stores)
+      }); //nexttick to stop memory leaking in recursion, force async
+    })
+}
+
+/**
+ * Makes a single call to the stock url to check the stock.
+ * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
+ */
+function getStockRequest(stores) {
+  return rp(stockRequest)
+    .then(function(stock) {
+      console.log("got stock list");
+      processStock(stores, stock);
+    })
+    .catch(function(err) {
+      reportError("Error downloading stock list " + err)
+    });
+}
+
+/**
+ * Once stock is retrieved from the stock url, checks the stock to see if it has any models you're interested in
+ * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
+ * @param {object} stock - parsed json retreived from the stock url
+ */
+function processStock(stores, stock) {
+  var storesWithStock = [];
+  var unfoundModels = {}; //where the model code doesnt exist
+
+  Object.keys(stock).forEach(function(storeCode) {
+    var store = stores[storeCode];
+    if (store == undefined) {
+      return; //skip non-stores
+    }
+    checkStoreStock(store, storeCode, stock, storesWithStock, unfoundModels);
+  });
+
+  sendStockMessage(storesWithStock);
+  sendUnfoundModelsMessage(unfoundModels)
+}
+
+/**
+ * For a single store (represented by storcode) checks that stores stock to see if it has a model you are interested in
+ * @param {string} store - The store name (e.g. Covent Garden)
+ * @param {object} storeCode - the store code (e.g. R232)
+ * @param {object} stock - parsed json retreived from the stock url
+ * @param {array} storesWithStock - A string array, stores that have stock of the model you are interest in will be added to this array (in the format of a user displayable string message saying x store has stock of y)
+ * @param {object} unfoundModels - associative array, models that were not found in the stores stock list will be added to this so that you can report back to the user that they may have a typo or non-existant model
+ */
+function checkStoreStock(store, storeCode, stock, storesWithStock, unfoundModels) {
+  var storeStock = stock[storeCode];
+  modelsWanted.forEach(function(modelCode) {
+    if (storeStock[modelCode] == undefined) {
+      unfoundModels[modelCode] = 1;
+    } else if (storeStock[modelCode].toLowerCase() == "all") {
+      addStoreToNotification(storesWithStock, store, modelCode, storeCode);
+    }
+  });
+}
+
+/**
+ * Adds a store to the list of stores with stock, when stock of a model is found
+ * First of all checks the cache to see if a notification was already sent about this store and this model, if so, this will skip adding that model to the notification and do nothing.
+ * @param {array} storesWithStock - A string array, stores that have stock of the model you are interest in (and no message was already sent recently) will be added to this array (in the format of a user displayable string message saying x store has stock of y).
+ * @param {string} store - The store name (e.g. Covent Garden)
+ * @param {string} modelCode - The model found in stock
+ * @param {object} storeCode - the store code (e.g. R232) the stock was found in
+ */
+function addStoreToNotification(storesWithStock, store, modelCode, storeCode) {
+  //check if it is in the cache to say a notification was already recently sent about this store
+  var key = storeCode + modelCode;
+  var cached = notificationsSentCache.get(key);
+  if (cached == undefined) {
+    notificationsSentCache.set(key, "sent");
+    storesWithStock.push(store + " has stock of " + models[modelCode]);
+  }
+}
+
+/**
+ * Send the notification about models found stock (if any - if no models are found no notification will be displayed, and 
+ * "No Stock" is diplayed in the console)
+ * @param {array} storesWithStock an array of messages about stock found in stores, e.g. ["model x was found in y", "model z was found in y"]. This will be used as the notificaiton text
+ */
+function sendStockMessage(storesWithStock) {
+  if (storesWithStock.length > 0) {
+    var message = "";
+    storesWithStock.forEach(function(storeMessage) {
+      message += storeMessage + "\n";
+    });
+
+    console.log(message);
+    sendProwlMessage(message, 2);
+  } else {
+    console.log("No New Stock");
+  }
+}
+
+/**
+ * Send the notification about models that were not found in any of the store lists (e.g. due to issue with store feed)
+ * @param {object} unfoundModels an associative array of model codes as keys where the model was not found (e.g. {"B35643" : anything, "FKGJF" : anything} )
+ */
+function sendUnfoundModelsMessage(unfoundModels) {
+  var models = "";
+  for (var key in unfoundModels) {
+    if (unfoundModels.hasOwnProperty(key)) {
+      models += key + " ";
+    }
+  }
+  if (models.length > 0) {
+    reportError("Some of the models you requested were not found in the store stock list, there may be a problem with the store feed: " + models);
+  }
+
+}
+
+/**
+ * Sends a message over prowl to the user if theprowlApiKey variable is set up.
+ * Does nothing if no api key exists
+ * @param {string} message The message to send. This is the exact text that will get sent as the notification
+ * @param {int} priority A priority between -2 (least priority) an 2 (most priority) as defined in the prowl API
+ */
+function sendProwlMessage(message, priority) {
+  if (prowlApiKey.length > 0) {
+    var prowlApiRequest = {
+      method: 'POST',
+      uri: 'https://api.prowlapp.com/publicapi/add',
+      form: {
+        apikey: prowlApiKey,
+        priority: priority,
+        url: pushNotificationOpenUrl,
+        application: "Stock Checker",
+        "event": "iPhone 7 Stock",
+        description: message,
+      },
+    };
+
+    rp(prowlApiRequest)
+      .then(function() {
+        console.log("push notification sent");
+      })
+      .catch(function(err) {
+        console.log("Error sending push notification" + err);
+      });
+  } else {
+    console.log("Prowl message skipped due to no api key");
+  }
+}
+
+/**
+ * Logs an error on the console and by sending a prowl message
+ * @param {string} error the error message
+ */
+function reportError(error) {
+  var message = "iPhone Stock Checker Error: " + error;
+  console.log("ERROR:" + message);
+  sendProwlMessage(message, 0);
+}
+
+/**
+ * Validates the models you have asked for are in the valid models list (models) and the list isnt empty;
+ */
+function validateWantedModels() {
+  //no wanted models
+  if (modelsWanted.length == 0) {
+    reportError("You have not set up any wanted models in the modelsWanted property. Polling has NOT started! ");
+    return false;
+  }
+
+  //no models config
+  if (models.length == 0) {
+    reportError("There are no models in the models config, this is a configuration error. Polling has NOT started! ");
+    return false;
+  }
+
+  //check validity of modelsWanted
+  var invalidModels = [];
+  modelsWanted.forEach(function(model) {
+    if (models[model] == undefined) {
+      invalidModels.push(model);
+    }
+  });
+
+  if (invalidModels.length > 0) {
+    var message = "Invalid models were found in your modelsWanted property. Polling has NOT started! ";
+    message += invalidModels.reduce(function(result, current) {
+      return result += " " + current
+    }, "");
+    reportError(message);
+    return false
+  }
+
+  return true;
+}
+
+//Go!
+if (validateWantedModels()) {
+  rp(storesRequest)
+    .then(function(stores) {
+      console.log("Downloaded stores list");
+      var storesFlattend = {};
+      stores.stores.forEach(function(store) {
+        storesFlattend[store.storeNumber] = store.storeName
+      });
+
+      sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
+
+      getStock(storesFlattend)
+    })
+    .catch(function(err) {
+      reportError("Error downloading stores " + err);
+    });
+}
+
+

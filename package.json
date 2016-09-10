@@ -1,0 +1,33 @@
+{
+  "name": "iphone-stock-checker",
+  "version": "1.0.0",
+  "description": "Polls the apple in-store reservations checker for iphone stock",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TomThorpe/NodeiPhoneStockChecker.git"
+  },
+  "keywords": [
+    "apple",
+    "iphone",
+    "stock",
+    "instore",
+    "in-store"
+  ],
+  "author": "Tom Thorpe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TomThorpe/NodeiPhoneStockChecker/issues"
+  },
+  "homepage": "https://github.com/TomThorpe/NodeiPhoneStockChecker#readme",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "node-cache": "^3.2.1",
+    "request": "^2.74.0",
+    "request-promise": "^4.1.1"
+  }
+}
