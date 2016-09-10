@@ -185,7 +185,7 @@ function sendUnfoundModelsMessage(unfoundModels) {
     }
   }
   if (unfound.length > 0) {
-    reportError("Some of the models you requested were not found in the store stock list, there may be a problem with the store feed: " + unfound);
+    reportError("Some of the models you requested were not found in the store stock list, there is either a problem with the store feed, or you have picked the wrong models for the country you chose " + unfound);
   }
 
 }
