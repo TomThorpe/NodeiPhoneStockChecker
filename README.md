@@ -10,7 +10,7 @@ _Note: This project uses Prowl to send notifications to you when stock is found,
 * I suggest Digital Ocean, use my referral code ( https://m.do.co/c/a3dff0c5c6c3 ) to get $10 free credit, enough to run this script the simplest droplet for 2 months (and I get a bonus too!)
 * Clone this repo to your envirionment
 * Run "npm install"
-* Open index.js and edit the properties at the top of the file under BEGIN CONFIG OPTIONS.
+* Open `config.js` and edit the properties for whatever you need.
   * `interval` - The interval between polling in milliseconds. I suggest 3 seconds (3000 milliseconds). Dont make it to small.
   * `modelsWanted` - An array of strings of the models you want. The script will search for these models in any stores. There is a full list of models in the `iphone-models.js` file. **Remember to pick one for your country, and the right type e.g. GSM**. If it is not there, try and research the model number and maybe open a PR to add it here :-)
   * `prowlApiKey` The API key for your prowl account. Get it from the API tab at https://www.prowlapp.com

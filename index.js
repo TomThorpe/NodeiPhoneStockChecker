@@ -14,40 +14,7 @@ var rp = require('request-promise');
 var Promise = require("bluebird");
 var NodeCache = require("node-cache");
 var models = require("./iphone-models.js");
-
-
-//BEGIN CONFIG OPTIONS--------
-/**
- * The interval to wait in betwen polls (in milliseconds)
- */
-var interval = 3000; //milliseconds
-
-/**
- * array of the models you want. Use the models list below if you arent sure of the model numbers
- */
-var modelsWanted = ["MN4V2B/A"];
-
-/**
- * prowl API. Used for push notifications. Sign up at https://www.prowlapp.com and download the app to your phone
- * If you dont set this up you won't get push notifications, you will only get console output
- */
-var prowlApiKey = ""; //add your API key
-
-/**
- * The url to the list of stores. These are different for different countries
- * CHANGE THIS IF YOU ARE NOT IN THE UK
- * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensibl
- */
-var storesJsonUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/stores.json";
-
-/**
- * The url to the list of stock. These are different for different countries
- * CHANGE THIS IF YOU ARE NOT IN THE UK
- * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensibl
- */
-var stockJsonUrl = "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/availability.json";
-//END CONFIG OPTIONS----------
-
+var config = require("./config.js");
 
 /**
  * Cache to stop messages being sent about stock on every request. If a message was already sent in last x seconds, it wont be sent again
@@ -58,12 +25,12 @@ var notificationsSentCache = new NodeCache({
 });
 
 var storesRequest = {
-  uri: storesJsonUrl,
+  uri: config.storesJsonUrl,
   json: true
 };
 
 var stockRequest = {
-  uri: stockJsonUrl,
+  uri: config.stockJsonUrl,
   json: true
 };
 
@@ -73,7 +40,7 @@ var stockRequest = {
  */
 function getStock(stores) {
   getStockRequest(stores)
-    .delay(interval)
+    .delay(config.interval)
     .then(function() {
       process.nextTick(function() {
         getStock(stores)
@@ -127,7 +94,7 @@ function processStock(stores, stock) {
  */
 function checkStoreStock(store, storeCode, stock, storesWithStock, unfoundModels) {
   var storeStock = stock[storeCode];
-  modelsWanted.forEach(function(modelCode) {
+  config.modelsWanted.forEach(function(modelCode) {
     if (storeStock[modelCode] == undefined) {
       unfoundModels[modelCode] = 1;
     } else if (storeStock[modelCode].toLowerCase() == "all") {
@@ -216,12 +183,12 @@ function sendUnfoundModelsMessage(unfoundModels) {
  * @param {int} priority A priority between -2 (least priority) an 2 (most priority) as defined in the prowl API
  */
 function sendProwlMessage(message, priority) {
-  if (prowlApiKey.length > 0) {
+  if (config.prowlApiKey.length > 0) {
     var prowlApiRequest = {
       method: 'POST',
       uri: 'https://api.prowlapp.com/publicapi/add',
       form: {
-        apikey: prowlApiKey,
+        apikey: config.prowlApiKey,
         priority: priority,
         application: "Stock Checker",
         "event": "iPhone 7 Stock",
@@ -256,7 +223,7 @@ function reportError(error) {
  */
 function validateWantedModels() {
   //no wanted models
-  if (modelsWanted.length == 0) {
+  if (config.modelsWanted.length == 0) {
     reportError("You have not set up any wanted models in the modelsWanted property. Polling has NOT started! ");
     return false;
   }
@@ -269,7 +236,7 @@ function validateWantedModels() {
 
   //check validity of modelsWanted
   var invalidModels = [];
-  modelsWanted.forEach(function(model) {
+  config.modelsWanted.forEach(function(model) {
     if (models.models[model] == undefined) {
       invalidModels.push(model);
     }
