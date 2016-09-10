@@ -25,7 +25,7 @@ var interval = 3000; //milliseconds
 /**
  * array of the models you want. Use the models list below if you arent sure of the model numbers
  */
-var modelsWanted = ["MN4V2B/A", "MN982B/A"];
+var modelsWanted = ["MN4V2B/A"];
 
 /**
  * prowl API. Used for push notifications. Sign up at https://www.prowlapp.com and download the app to your phone
