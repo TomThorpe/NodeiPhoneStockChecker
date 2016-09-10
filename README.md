@@ -19,3 +19,6 @@ _Note: This project uses Prowl to send notifications to you when stock is found,
 * Save your changes to the index.js file
 * Run `npm start`. The script will display debug info on the console output, and also send you a test push notification so that you know notifications are working
 * *Remember, if you close your window, the task will stop running!* If you are using digitalocean or another remote server, you might want to first run `tmux` (https://danielmiessler.com/study/tmux/) before running `npm start` so that you can leave the task running.
+
+# Tips
+* When stock is found this tool sends it with a priority of "Emergency" in Prowl. If you change the notification sounds in Prowl, you can set a longer and louder notification alert for Emergency messages
