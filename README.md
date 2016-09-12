@@ -19,7 +19,7 @@ _Note: This project uses Prowl to send notifications to you when stock is found,
   * `stockJsonUrl`  Stock list JSON If you are not in the UK, you need to set this to the JSON url for location of your choice by figuring out the json (e.g. https://reserve.cdn-apple.com/US/en_US/reserve/iPhone/availability.json for the USA)
 * Save your changes to the index.js file
 * Run `npm start`. The script will display debug info on the console output, and also send you a test push notification so that you know notifications are working
-* *Remember, if you close your window, the task will stop running!* If you are using digitalocean or another remote server, you might want to first run `tmux` (https://danielmiessler.com/study/tmux/) before running `npm start` so that you can leave the task running.
+* *Remember, if you close your window, the task will stop running!* If you are using digitalocean or another remote server, you might want to first run `tmux` (https://danielmiessler.com/study/tmux/) before running `npm start` so that you can leave the task running. You may also want to use something like `forever` (https://www.npmjs.com/package/forever) so that if the script does crash for some reason it will be restarted
 
 # Tips
 * When stock is found this tool sends it with a priority of "Emergency" in Prowl. If you change the notification sounds in Prowl you can set a longer and louder notification alert for Emergency messages
