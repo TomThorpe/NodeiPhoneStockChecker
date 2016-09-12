@@ -32,14 +32,16 @@ prowlApiKey : "", //add your API key
 /**
  * The url to the list of stores. These are different for different countries
  * CHANGE THIS IF YOU ARE NOT IN THE UK
- * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensibl
+ * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensible
+ * US version is https://reserve.cdn-apple.com/US/en_US/reserve/iPhone/stores.json
  */
 storesJsonUrl : "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/stores.json",
 
 /**
  * The url to the list of stock. These are different for different countries
  * CHANGE THIS IF YOU ARE NOT IN THE UK
- * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensibl
+ * Verify the json works by accessing the URL yourself in the browser and make sure it looks sensible
+ * US version is https://reserve.cdn-apple.com/US/en_US/reserve/iPhone/availability.json
  */
 stockJsonUrl : "https://reserve.cdn-apple.com/GB/en_GB/reserve/iPhone/availability.json",
 
