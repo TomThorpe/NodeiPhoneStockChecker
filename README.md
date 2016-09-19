@@ -1,7 +1,7 @@
-# NodeiPhoneStockChecker
-
 ## Update
 It seems apple now have two different ways of querying stock. This script uses the old way, and it seems like they might be phasing that out to try and stop people scraping data. I can't guarantee this script will work anymore now - sorry!
+
+# NodeiPhoneStockChecker
 
 A Node.js project to poll the apple in-store reservations checker for iphones and send you a notification
 
